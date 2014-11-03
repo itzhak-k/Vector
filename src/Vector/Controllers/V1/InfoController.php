@@ -13,10 +13,15 @@ namespace Vector\Controllers\V1 {
 
     class InfoController
     {
-        public function infoAction()
+        public function infoAction(Application $app)
         {
 
-            return 'Info';
+            return $app->json([
+                'status' => 'active',
+                'info'   => [
+                    'version'    => 'v1',
+                    'creation' => '2014'
+                ]]);
         }
     }
 }
