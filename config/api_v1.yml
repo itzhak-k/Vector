@@ -1,0 +1,14 @@
+api.writer:
+  path:     /writer
+  defaults: { _controller: 'Vector\Controllers\V1\WriterController::writerAction' }
+  methods: [GET]
+
+api.writerid:
+  path: /writer/{id}
+  defaults: { _controller: 'Vector\Controllers\V1\WriterController::writerAction' }
+  methods: [GET]
+
+api.writerid_process:
+  path: /writer/{id}
+  defaults: { _controller: 'Vector\Controllers\V1\WriterController::writerAction' }
+  methods: [POST]

@@ -1,0 +1,13 @@
+home:
+  path: /
+  defaults: { _controller: 'Vector\Controllers\V1\RootController::rootAction' }
+  methods: [GET]
+
+info:
+  path: /info
+  defaults: { _controller: 'Vector\Controllers\V1\InfoController::infoAction' }
+  methods: [GET]
+
+api:
+  prefix: /v1
+  resource: api_v1.yml
