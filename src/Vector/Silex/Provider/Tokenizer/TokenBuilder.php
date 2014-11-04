@@ -2,22 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: admin
- * Date: 10/26/2014
- * Time: 3:33 PM
+ * Date: 11/4/2014
+ * Time: 4:21 PM
  */
 
-namespace Vector\Silex\Provider\Mongo {
+namespace Vector\Silex\Provider\Tokenizer {
 
     use Silex\Application;
 
-
-    class MongoBuilder
+    class TokenBuilder
     {
 
         public static function mountProviderIntoApplication(Application $app)
         {
-            $app->register(new MongoServiceProvider());
+            $app->register(new TokenServiceProvider());
         }
-
     }
 }

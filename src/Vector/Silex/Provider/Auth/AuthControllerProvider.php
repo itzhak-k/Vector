@@ -1,76 +1,77 @@
 <?php
 
-namespace Vector\Silex\Provider\Auth;
+namespace Vector\Silex\Provider\Auth {
 
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpFoundation\Request;
-use Silex\ControllerProviderInterface;
-use Silex\Application;
+    use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+    use Symfony\Component\HttpFoundation\Request;
+    use Silex\ControllerProviderInterface;
+    use Silex\Application;
 
-class AuthControllerProvider implements ControllerProviderInterface
-{
-    const VALIDATE_CREDENTIALS = '/validateCredentials';
-    const TOKEN_HEADER_KEY     = 'X-Token';
-    const TOKEN_REQUEST_KEY    = '_token';
-
-    private $baseRoute;
-
-    public function setBaseRoute($baseRoute)
+    class AuthControllerProvider implements ControllerProviderInterface
     {
-        $this->baseRoute = $baseRoute;
+        const VALIDATE_CREDENTIALS = '/validateCredentials';
+        const TOKEN_HEADER_KEY = 'X-Token';
+        const TOKEN_REQUEST_KEY = '_token';
 
-        return $this;
-    }
+        private $baseRoute;
 
-    public function connect(Application $app)
-    {
-        $this->setUpMiddlewares($app);
+        public function setBaseRoute($baseRoute)
+        {
+            $this->baseRoute = $baseRoute;
 
-        return $this->extractControllers($app);
-    }
+            return $this;
+        }
 
-    private function extractControllers(Application $app)
-    {
-        $controllers = $app['controllers_factory'];
+        public function connect(Application $app)
+        {
+            $this->setUpMiddlewares($app);
 
-        $controllers->get(self::VALIDATE_CREDENTIALS, function (Request $request) use ($app) {
-            $user   = $request->get('user');
-            $pass   = $request->get('pass');
-            $status = $app[AuthServiceProvider::AUTH_VALIDATE_CREDENTIALS]($user, $pass);
+            return $this->extractControllers($app);
+        }
 
-            return $app->json([
-                'status' => $status,
-                'info'   => $status ? ['token' => $app[AuthServiceProvider::AUTH_NEW_TOKEN]($user)] : []
+        private function extractControllers(Application $app)
+        {
+            $controllers = $app['controllers_factory'];
 
-            ]);
-        });
+            $controllers->get(self::VALIDATE_CREDENTIALS, function (Request $request) use ($app) {
+                $client = $request->get('client');
+                $pass = $request->get('pass');
+                $status = $app[AuthServiceProvider::AUTH_VALIDATE_CREDENTIALS]($client, $pass);
 
-        return $controllers;
-    }
+                return $app->json([
+                    'status' => $status,
+                    'info' => $status ? ['token' => $app[AuthServiceProvider::AUTH_NEW_TOKEN]($client)] : []
 
-    private function setUpMiddlewares(Application $app)
-    {
-        $app->before(function (Request $request) use ($app) {
-            if (!$this->isAuthRequiredForPath($request->getPathInfo())) {
-                if (!$this->isValidTokenForApplication($app, $this->getTokenFromRequest($request))) {
-                    throw new AccessDeniedHttpException('Access Denied');
+                ]);
+            });
+
+            return $controllers;
+        }
+
+        private function setUpMiddlewares(Application $app)
+        {
+            $app->before(function (Request $request) use ($app) {
+                if (!$this->isAuthRequiredForPath($request->getPathInfo())) {
+                    if (!$this->isValidTokenForApplication($app, $this->getTokenFromRequest($request))) {
+                        throw new AccessDeniedHttpException('Access Denied');
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    private function getTokenFromRequest(Request $request)
-    {
-        return $request->headers->get(self::TOKEN_HEADER_KEY, $request->get(self::TOKEN_REQUEST_KEY));
-    }
+        private function getTokenFromRequest(Request $request)
+        {
+            return $request->headers->get(self::TOKEN_HEADER_KEY, $request->get(self::TOKEN_REQUEST_KEY));
+        }
 
-    private function isAuthRequiredForPath($path)
-    {  //var_dump(in_array($path, [$this->baseRoute . self::VALIDATE_CREDENTIALS,'/'])); print($path);
-        return in_array($path, [$this->baseRoute . self::VALIDATE_CREDENTIALS,'/','/info']);
-    }
+        private function isAuthRequiredForPath($path)
+        {
+            return in_array($path, [$this->baseRoute . self::VALIDATE_CREDENTIALS, '/', '/info']);
+        }
 
-    private function isValidTokenForApplication(Application $app, $token)
-    {
-        return $app[AuthServiceProvider::AUTH_VALIDATE_TOKEN]($token);
+        private function isValidTokenForApplication(Application $app, $token)
+        {
+            return $app[AuthServiceProvider::AUTH_VALIDATE_TOKEN]($token);
+        }
     }
 }

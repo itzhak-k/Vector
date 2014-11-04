@@ -1,14 +1,15 @@
 <?php
 
-namespace Vector\Silex\Provider\Auth;
+namespace Vector\Silex\Provider\Auth {
 
-use Silex\Application;
+    use Silex\Application;
 
-class AuthBuilder
-{
-    public static function mountProviderIntoApplication($route, Application $app)
+    class AuthBuilder
     {
-        $app->register(new AuthServiceProvider());
-        $app->mount($route, (new AuthControllerProvider())->setBaseRoute($route));
+        public static function mountProviderIntoApplication($route, Application $app)
+        {
+            $app->register(new AuthServiceProvider());
+            $app->mount($route, (new AuthControllerProvider())->setBaseRoute($route));
+        }
     }
 }

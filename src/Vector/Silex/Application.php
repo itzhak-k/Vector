@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Vector\Silex\Provider\Router\RouterBuilder;
 use Vector\Silex\Provider\Auth\AuthBuilder;
 use Vector\Silex\Provider\Mongo\MongoBuilder;
+use Vector\Silex\Provider\Tokenizer\TokenBuilder;
 
 class Application extends SilexApplication
 {
@@ -16,6 +17,7 @@ class Application extends SilexApplication
         parent::__construct($values);
 
         MongoBuilder::mountProviderIntoApplication($this);
+        TokenBuilder::mountProviderIntoApplication($this);
         AuthBuilder::mountProviderIntoApplication('/auth', $this);
         RouterBuilder::mountProviderIntoApplication($this);
 
